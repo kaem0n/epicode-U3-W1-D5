@@ -3,11 +3,12 @@ import Row from 'react-bootstrap/Row'
 import Col from 'react-bootstrap/Col'
 import Spinner from 'react-bootstrap/Spinner'
 
-let titlesToShow = []
+import ColorThief from 'colorthief/dist/color-thief.mjs'
 
 class Titles extends Component {
   state = {
     titles: [],
+    avgColors: [],
     isLoading: true,
     isError: false,
     errorMsg: '',
@@ -23,13 +24,25 @@ class Titles extends Component {
         }
       })
       .then((data) => {
+        const colors = []
+        const titlesToShow = []
+        const colorThief = new ColorThief()
         for (let i = 0; i < 6; i++) {
           if (data.Search[i].Type !== 'game') {
+            const img = new Image()
+            img.crossOrigin = 'Anonymous'
+            img.src = data.Search[i].Poster
             titlesToShow.push(data.Search[i])
+            setTimeout(() => {
+              colors.push(colorThief.getColor(img))
+            }, 100)
           }
         }
-        this.setState({ titles: titlesToShow, isLoading: false })
-        titlesToShow = []
+        this.setState({ titles: titlesToShow })
+        setTimeout(
+          () => this.setState({ avgColors: colors, isLoading: false }),
+          100
+        )
       })
       .catch((err) => {
         this.setState({ isLoading: false, isError: true, errorMsg: `${err}` })
@@ -60,10 +73,16 @@ class Titles extends Component {
               {this.state.errorMsg}
             </h1>
           ) : (
-            this.state.titles.map((title) => {
+            this.state.avgColors.length > 0 &&
+            this.state.titles.map((title, i) => {
               return (
                 <Col key={title.imdbID} className="thumbnail">
-                  <div title={`${title.Title} (${title.Year})`}>
+                  <div
+                    title={`${title.Title} (${title.Year})`}
+                    style={{
+                      backgroundColor: `rgb(${this.state.avgColors[i][0]}, ${this.state.avgColors[i][1]}, ${this.state.avgColors[i][2]})`,
+                    }}
+                  >
                     <img src={title.Poster} alt={title.imdbID} />
                   </div>
                 </Col>
