@@ -29,20 +29,26 @@ class Titles extends Component {
         const colorThief = new ColorThief()
         for (let i = 0; i < 6; i++) {
           if (data.Search[i].Type !== 'game') {
+            let color
             const img = new Image()
             img.crossOrigin = 'Anonymous'
             img.src = data.Search[i].Poster
-            titlesToShow.push(data.Search[i])
-            setTimeout(() => {
-              colors.push(colorThief.getColor(img))
-            }, 100)
+            img.onload = () => {
+              color = colorThief.getColor(img)
+              colors.push(color)
+              titlesToShow.push(data.Search[i])
+            }
           }
         }
-        this.setState({ titles: titlesToShow })
-        setTimeout(
-          () => this.setState({ avgColors: colors, isLoading: false }),
-          100
-        )
+        console.log('colors', colors)
+        console.log('titlesToShow', titlesToShow)
+        setTimeout(() => {
+          this.setState({
+            titles: titlesToShow,
+            avgColors: colors,
+            isLoading: false,
+          })
+        }, 50)
       })
       .catch((err) => {
         this.setState({ isLoading: false, isError: true, errorMsg: `${err}` })
