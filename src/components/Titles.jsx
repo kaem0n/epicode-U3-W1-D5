@@ -37,18 +37,11 @@ class Titles extends Component {
               color = colorThief.getColor(img)
               colors.push(color)
               titlesToShow.push(data.Search[i])
+              this.setState({ titles: titlesToShow, avgColors: colors })
             }
           }
         }
-        console.log('colors', colors)
-        console.log('titlesToShow', titlesToShow)
-        setTimeout(() => {
-          this.setState({
-            titles: titlesToShow,
-            avgColors: colors,
-            isLoading: false,
-          })
-        }, 50)
+        this.setState({ isLoading: false })
       })
       .catch((err) => {
         this.setState({ isLoading: false, isError: true, errorMsg: `${err}` })
